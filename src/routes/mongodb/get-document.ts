@@ -4,46 +4,45 @@ import mongodb from '../../mongodb/mongodb';
 const router = express.Router();
 
 router.get('/all', async (req, res) => {
-  const querys = req.query as {
+  const { collectionName, dbName, nameModel } = req.query as {
     dbName: string;
+    nameModel: string;
     collectionName: string;
   };
 
-  if (!querys.dbName || !querys.collectionName) {
+  if (!dbName || !nameModel) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: dbName, collectionName',
+        'Algumas dessas informações não foram fornecidas: dbName, nameModel, collectionName (OPCIONAL).',
     });
     return;
   }
 
-  const { getAllDocuments } = mongodb(querys.dbName);
+  const { getAllDocuments } = mongodb(dbName, nameModel, collectionName);
 
   try {
-    const documents = await getAllDocuments(
-      querys.dbName,
-      querys.collectionName,
-    );
+    const documents = await getAllDocuments();
     res.status(200).json(documents);
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, error: 'Erro ao recuperar documentos.' });
+    res.status(500).json({
+      success: false,
+      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+    });
     return;
   }
 });
 
 router.get('/', async (req, res) => {
-  const querys = req.query as {
+  const { collectionName, dbName, id } = req.query as {
     id: string;
     dbName: string;
     collectionName: string;
   };
 
-  const { getDocumentById } = mongodb(querys.dbName);
+  const { getDocumentById } = mongodb(dbName, dbName, collectionName);
 
-  if (!querys.dbName || !querys.collectionName || !querys.id) {
+  if (!dbName || !collectionName || !id) {
     res.status(400).json({
       success: false,
       error:
@@ -53,16 +52,13 @@ router.get('/', async (req, res) => {
   }
 
   try {
-    const document = await getDocumentById(
-      querys.id,
-      querys.dbName,
-      querys.collectionName,
-    );
+    const document = await getDocumentById(id);
     res.status(200).json(document);
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, error: 'Erro ao recuperar documento.' });
+    res.status(500).json({
+      success: false,
+      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+    });
     return;
   }
 });

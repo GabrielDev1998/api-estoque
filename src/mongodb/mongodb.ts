@@ -1,6 +1,6 @@
 import mongoose, { Schema, SchemaDefinition } from 'mongoose';
 
-function mongodb(dbName: string) {
+function mongodb(dbName: string, nameModel: string, collectionName?: string) {
   const URL_MONGODB = process.env.MONGODB_URL as string;
 
   // Função para conectar ao banco de dados
@@ -21,11 +21,7 @@ function mongodb(dbName: string) {
   connectToDatabase();
 
   // Função para criar ou retornar um modelo dinâmico
-  const Model = (
-    nameModel: string,
-    schema: SchemaDefinition,
-    collectionName?: string,
-  ) => {
+  const Model = (schema: SchemaDefinition) => {
     // Verifica se o modelo já foi compilado
     if (mongoose.models[nameModel]) {
       return mongoose.models[nameModel]; // Retorna o modelo existente
@@ -34,7 +30,8 @@ function mongodb(dbName: string) {
     // Cria o modelo se não existir
     return mongoose.model(
       nameModel,
-      new Schema(schema, { collection: collectionName || nameModel }),
+      new Schema(schema),
+      collectionName || nameModel,
     );
   };
 
@@ -58,10 +55,7 @@ function mongodb(dbName: string) {
       const existingModel = mongoose.models[nameModel];
       return (
         existingModel ||
-        mongoose.model(
-          nameModel,
-          new Schema(schema, { collection: collectionName }),
-        )
+        mongoose.model(nameModel, new Schema(schema), collectionName)
       );
     } catch (error) {
       console.error('Erro ao validar o modelo', (error as Error).message);
@@ -71,13 +65,11 @@ function mongodb(dbName: string) {
 
   // Função para criar um documento no banco de dados
   const createDocument = async (
-    nameModel: string,
     schema: SchemaDefinition,
     data: Record<string, any>,
-    collectionName?: string,
   ) => {
     try {
-      const DynamicModel = Model(nameModel, schema, collectionName); // Obtém o modelo
+      const DynamicModel = Model(schema); // Obtém o modelo
       const document = new DynamicModel(data); // Cria o documento
       const savedDocument = await document.save(); // Salva no banco
       return { success: true, data: savedDocument };
@@ -88,11 +80,7 @@ function mongodb(dbName: string) {
   };
 
   // Função para deletar um documento
-  const deleteDocument = async (
-    id: string,
-    nameModel: string,
-    collectionName: string,
-  ) => {
+  const deleteDocument = async (id: string) => {
     try {
       // Valida o ID e garante que seja um ObjectId
       const objectId = validateId(id);
@@ -131,11 +119,9 @@ function mongodb(dbName: string) {
 
   // Função para atualizar um documento
   const updateDocumentById = async (
-    nameModel: string,
     schema: SchemaDefinition,
     id: string,
     data: any,
-    collectionName?: string,
   ) => {
     try {
       const objectId = validateId(id);
@@ -180,10 +166,7 @@ function mongodb(dbName: string) {
   };
 
   // Função para listar todos os documentos de uma coleção
-  const getAllDocuments = async (
-    nameModel: string,
-    collectionName?: string,
-  ) => {
+  const getAllDocuments = async () => {
     try {
       const GetModel = await validateCompiledModel(
         nameModel,
@@ -207,11 +190,7 @@ function mongodb(dbName: string) {
   };
 
   // Função para listar um documento específico por ID
-  const getDocumentById = async (
-    id: string,
-    nameModel: string,
-    collectionName?: string,
-  ) => {
+  const getDocumentById = async (id: string) => {
     try {
       const objectId = validateId(id);
       if (!objectId) {

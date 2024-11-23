@@ -4,19 +4,14 @@ import mongodb from '../../mongodb/mongodb';
 const router = express.Router();
 
 router.delete('/', async (req, res) => {
-  const querys = req.query as {
+  const { collectionName, dbName, id, nameModel } = req.query as {
     id: string;
     nameModel: string;
     collectionName: string;
     dbName: string;
   };
 
-  if (
-    !querys.id ||
-    !querys.collectionName ||
-    !querys.collectionName ||
-    !querys.dbName
-  ) {
+  if (!id || !collectionName || !collectionName || !dbName) {
     res.status(400).json({
       success: false,
       error:
@@ -25,19 +20,16 @@ router.delete('/', async (req, res) => {
     return;
   }
 
-  const { deleteDocument } = mongodb(querys.dbName);
+  const { deleteDocument } = mongodb(dbName, nameModel, collectionName);
 
   try {
-    const result = await deleteDocument(
-      querys.id,
-      querys.nameModel,
-      querys.collectionName,
-    );
+    const result = await deleteDocument(id);
     res.status(200).json(result);
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, error: 'Erro ao excluir documento.' });
+    res.status(500).json({
+      success: false,
+      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+    });
     return;
   }
 });

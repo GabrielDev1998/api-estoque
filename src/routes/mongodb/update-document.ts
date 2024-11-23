@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 const router = express.Router();
 
 router.put('/', async (req, res) => {
-  const querys = req.query as { id: string };
+  const query = req.query as { id: string };
   const { dbName, nameModel, schema, collectionName, data } = req.body;
 
   if (!dbName || !nameModel || !schema || !collectionName || !data) {
@@ -17,28 +17,18 @@ router.put('/', async (req, res) => {
     return;
   }
 
-  const { updateDocumentById } = mongodb(dbName);
+  const { updateDocumentById } = mongodb(dbName, nameModel, collectionName);
 
   try {
-    const result = await updateDocumentById(
-      nameModel,
-      schema,
-      querys.id,
-      data,
-      collectionName,
-    );
+    const result = await updateDocumentById(schema, query.id, data);
 
     res.status(200).json(result);
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      error:
-        'Erro ao atualizar documento no MongoDB: ' + (error as Error).message,
+      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
     });
-  } finally {
-    // Desconecta após salvar o documento
-    await mongoose.disconnect();
+    return;
   }
 });
 

@@ -25,23 +25,17 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  const { createDocument } = mongodb(dbName);
+  const { createDocument } = mongodb(dbName, nameModel, collectionName);
 
   try {
-    const result = await createDocument(
-      nameModel,
-      schema,
-      data,
-      collectionName,
-    );
-
+    const result = await createDocument(schema, data);
     res.status(201).json(result);
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       success: false,
-      error: (error as Error).message,
+      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
     });
+    return;
   }
 });
 
