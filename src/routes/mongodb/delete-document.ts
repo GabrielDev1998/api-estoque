@@ -20,7 +20,7 @@ router.delete('/', async (req, res) => {
     return;
   }
 
-  const { deleteDocument } = mongodb(dbName, nameModel, collectionName);
+  const { deleteDocument } = await mongodb(dbName, nameModel, collectionName);
 
   try {
     const result = await deleteDocument(id);

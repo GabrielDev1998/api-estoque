@@ -1,24 +1,14 @@
 import mongoose, { Schema, SchemaDefinition } from 'mongoose';
+import connectToDatabase from './connectToDatabase';
 
-function mongodb(dbName: string, nameModel: string, collectionName?: string) {
-  const URL_MONGODB = process.env.MONGODB_URL as string;
+async function mongodb(
+  dbName: string,
+  nameModel: string,
+  collectionName?: string,
+) {
+  const URL_MONGODB = process.env.MONGODB_URL_PRODUCTION as string;
 
-  // Função para conectar ao banco de dados
-  const connectToDatabase = async () => {
-    try {
-      if (mongoose.connection.readyState === 0) {
-        // Verifica se a conexão está fechada
-        await mongoose.connect(URL_MONGODB, { dbName });
-        console.log('Conectado ao MongoDB');
-      }
-    } catch (err) {
-      console.error('Erro ao se conectar ao banco de dados:', err);
-      throw new Error('Falha ao se conectar ao banco de dados');
-    }
-  };
-
-  // Inicia a conexão com o banco de dados ao criar o serviço
-  connectToDatabase();
+  await connectToDatabase(URL_MONGODB, dbName);
 
   // Função para criar ou retornar um modelo dinâmico
   const Model = (schema: SchemaDefinition) => {

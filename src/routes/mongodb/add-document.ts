@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
     return;
   }
 
-  const { createDocument } = mongodb(dbName, nameModel, collectionName);
+  const { createDocument } = await mongodb(dbName, nameModel, collectionName);
 
   try {
     const result = await createDocument(schema, data);

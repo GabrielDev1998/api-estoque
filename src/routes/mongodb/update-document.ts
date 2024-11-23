@@ -17,7 +17,11 @@ router.put('/', async (req, res) => {
     return;
   }
 
-  const { updateDocumentById } = mongodb(dbName, nameModel, collectionName);
+  const { updateDocumentById } = await mongodb(
+    dbName,
+    nameModel,
+    collectionName,
+  );
 
   try {
     const result = await updateDocumentById(schema, query.id, data);

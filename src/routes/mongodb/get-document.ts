@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
     collectionName: string;
   };
 
-  const { getDocumentById } = mongodb(dbName, dbName, collectionName);
+  const { getDocumentById } = await mongodb(dbName, dbName, collectionName);
 
   if (!dbName || !collectionName || !id) {
     res.status(400).json({
