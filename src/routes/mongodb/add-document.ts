@@ -1,10 +1,8 @@
 import express from 'express';
 import mongodb from '../../mongodb/mongodb';
-import mongoose, { SchemaDefinition } from 'mongoose';
+import { SchemaDefinition } from 'mongoose';
 
 const router = express.Router();
-
-const { createDocument } = mongodb();
 
 type IAddDocument = {
   collectionName: string;
@@ -27,9 +25,10 @@ router.post('/', async (req, res) => {
     return;
   }
 
+  const { createDocument } = mongodb(dbName);
+
   try {
     const result = await createDocument(
-      dbName,
       nameModel,
       schema,
       data,
@@ -39,16 +38,10 @@ router.post('/', async (req, res) => {
     res.status(201).json(result);
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        error:
-          'Erro ao salvar documento no MongoDB: ' + (error as Error).message,
-      });
-  } finally {
-    // Desconecta após salvar o documento
-    await mongoose.disconnect();
+    res.status(500).json({
+      success: false,
+      error: (error as Error).message,
+    });
   }
 });
 

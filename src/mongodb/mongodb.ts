@@ -83,7 +83,7 @@ function mongodb(dbName: string) {
       return { success: true, data: savedDocument };
     } catch (error) {
       console.error('Erro ao criar documento:', (error as Error).message);
-      throw new Error('Falha ao criar documento');
+      throw new Error('Algum erro ocorreu ao tentar adicionar.');
     }
   };
 

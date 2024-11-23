@@ -8,15 +8,16 @@ router.put('/', async (req, res) => {
   const querys = req.query as { id: string };
   const { dbName, nameModel, schema, collectionName, data } = req.body;
 
-  const { updateDocumentById } = mongodb(dbName);
-
-  if (!querys.id || !data) {
+  if (!dbName || !nameModel || !schema || !collectionName || !data) {
     res.status(400).json({
       success: false,
-      error: 'ID do documento e dados não fornecidos.',
+      error:
+        'Algumas dessas informações não foram fornecidas: dbName, nameModel, schema, collectionName, data',
     });
     return;
   }
+
+  const { updateDocumentById } = mongodb(dbName);
 
   try {
     const result = await updateDocumentById(

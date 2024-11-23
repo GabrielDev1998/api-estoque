@@ -1,4 +1,4 @@
-import express, { query } from 'express';
+import express from 'express';
 import mongodb from '../../mongodb/mongodb';
 
 const router = express.Router();
@@ -9,8 +9,6 @@ router.get('/all', async (req, res) => {
     collectionName: string;
   };
 
-  const { getAllDocuments } = mongodb(querys.dbName);
-
   if (!querys.dbName || !querys.collectionName) {
     res.status(400).json({
       success: false,
@@ -19,6 +17,8 @@ router.get('/all', async (req, res) => {
     });
     return;
   }
+
+  const { getAllDocuments } = mongodb(querys.dbName);
 
   try {
     const documents = await getAllDocuments(

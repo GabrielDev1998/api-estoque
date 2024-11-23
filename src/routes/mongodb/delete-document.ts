@@ -11,16 +11,21 @@ router.delete('/', async (req, res) => {
     dbName: string;
   };
 
-  const { deleteDocument } = mongodb(querys.dbName);
-
-  if (!querys.id || !querys.collectionName || !querys.collectionName) {
+  if (
+    !querys.id ||
+    !querys.collectionName ||
+    !querys.collectionName ||
+    !querys.dbName
+  ) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: id, nameModel, collectionName',
+        'Algumas dessas informações não foram fornecidas: id, nameModel, collectionName, dbName.',
     });
     return;
   }
+
+  const { deleteDocument } = mongodb(querys.dbName);
 
   try {
     const result = await deleteDocument(
