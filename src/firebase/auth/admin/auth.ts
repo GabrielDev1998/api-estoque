@@ -4,6 +4,7 @@ function authFireBase() {
   const verifyToken = async (token: string) => {
     try {
       const res = await admin.auth().verifyIdToken(token);
+
       return {
         uid: res.uid,
         email: res.email,

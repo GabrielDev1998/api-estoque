@@ -18,11 +18,7 @@ async function mongodb(
     }
 
     // Cria o modelo se não existir
-    return mongoose.model(
-      nameModel,
-      new Schema(schema),
-      collectionName || nameModel,
-    );
+    return mongoose.model(nameModel, new Schema(schema), collectionName);
   };
 
   // Função para validar um ID
@@ -35,11 +31,7 @@ async function mongodb(
   };
 
   // Função para validar e compilar o modelo
-  const validateCompiledModel = async (
-    nameModel: string,
-    schema?: SchemaDefinition,
-    collectionName?: string,
-  ) => {
+  const validateCompiledModel = async (schema?: SchemaDefinition) => {
     try {
       // Verifica se o modelo já foi compilado
       const existingModel = mongoose.models[nameModel];
@@ -82,11 +74,7 @@ async function mongodb(
       }
 
       // Valida e obtém o modelo correto
-      const existingModel = await validateCompiledModel(
-        nameModel,
-        undefined,
-        collectionName,
-      );
+      const existingModel = await validateCompiledModel();
 
       const deletedDocument = await existingModel.findByIdAndDelete(objectId);
 
@@ -122,11 +110,7 @@ async function mongodb(
         };
       }
 
-      const UpdateModel = await validateCompiledModel(
-        nameModel,
-        schema,
-        collectionName,
-      );
+      const UpdateModel = await validateCompiledModel(schema);
 
       const updatedDocument = await UpdateModel.findByIdAndUpdate(
         objectId,
@@ -158,11 +142,7 @@ async function mongodb(
   // Função para listar todos os documentos de uma coleção
   const getAllDocuments = async () => {
     try {
-      const GetModel = await validateCompiledModel(
-        nameModel,
-        undefined,
-        collectionName,
-      );
+      const GetModel = await validateCompiledModel();
 
       const documents = await GetModel.find();
 
@@ -190,11 +170,7 @@ async function mongodb(
         };
       }
 
-      const GetModel = await validateCompiledModel(
-        nameModel,
-        undefined,
-        collectionName,
-      );
+      const GetModel = await validateCompiledModel();
 
       const document = await GetModel.findById(objectId);
       if (!document) {

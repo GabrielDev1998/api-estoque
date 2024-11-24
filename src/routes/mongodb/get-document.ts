@@ -7,7 +7,7 @@ router.get('/all', async (req, res) => {
   const { collectionName, dbName, nameModel } = req.query as {
     dbName: string;
     nameModel: string;
-    collectionName: string;
+    collectionName?: string;
   };
 
   if (!dbName || !nameModel) {
@@ -19,10 +19,15 @@ router.get('/all', async (req, res) => {
     return;
   }
 
-  const { getAllDocuments } = mongodb(dbName, nameModel, collectionName);
-
   try {
+    const { getAllDocuments } = await mongodb(
+      dbName,
+      nameModel,
+      collectionName,
+    );
+
     const documents = await getAllDocuments();
+
     res.status(200).json(documents);
   } catch (error) {
     res.status(500).json({
@@ -37,21 +42,20 @@ router.get('/', async (req, res) => {
   const { collectionName, dbName, id } = req.query as {
     id: string;
     dbName: string;
-    collectionName: string;
+    collectionName?: string;
   };
 
-  const { getDocumentById } = await mongodb(dbName, dbName, collectionName);
-
-  if (!dbName || !collectionName || !id) {
+  if (!dbName || !id) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: dbName, collectionName, id',
+        'Algumas dessas informações não foram fornecidas: dbName, id, collectionName (OPCIONAL)',
     });
     return;
   }
 
   try {
+    const { getDocumentById } = await mongodb(dbName, dbName, collectionName);
     const document = await getDocumentById(id);
     res.status(200).json(document);
   } catch (error) {
