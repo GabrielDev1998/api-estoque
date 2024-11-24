@@ -16,8 +16,6 @@ router.post('/', async (req, res) => {
   const { collectionName, schema, dbName, data, nameModel }: IAddDocument =
     req.body;
 
-  console.log(req.body);
-
   if (!schema || !data || !dbName || !nameModel) {
     res.status(400).json({
       success: false,
@@ -30,6 +28,7 @@ router.post('/', async (req, res) => {
   try {
     const { createDocument } = await mongodb(dbName, nameModel, collectionName);
     const result = await createDocument(schema, data);
+
     res.status(201).json(result);
   } catch (error) {
     res.status(500).json({
