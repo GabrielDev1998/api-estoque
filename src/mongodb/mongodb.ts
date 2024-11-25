@@ -20,6 +20,8 @@ async function mongodb(
     throw new Error('Variável de ambiente MONGODB_URL não encontrada.');
   }
 
+  console.log(URL_DB);
+
   await connectToDatabase(URL_DB, dbName);
 
   const getModel = async (schema?: SchemaDefinition) => {
