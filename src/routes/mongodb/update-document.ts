@@ -16,23 +16,6 @@ router.put('/', async (req, res) => {
     });
     return;
   }
-
-  try {
-    const { updateDocumentById } = await mongodb(
-      dbName,
-      nameModel,
-      collectionName,
-    );
-    const result = await updateDocumentById(schema, query.id, data);
-
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
-    });
-    return;
-  }
 });
 
 export default router;

@@ -7,63 +7,66 @@ router.get('/all', async (req, res) => {
   const { collectionName, dbName, nameModel } = req.query as {
     dbName: string;
     nameModel: string;
-    collectionName?: string;
+    collectionName: string;
   };
 
-  if (!dbName || !nameModel) {
+  if (!dbName || !nameModel || !collectionName) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: dbName, nameModel, collectionName (OPCIONAL).',
+        'Algumas dessas informações não foram fornecidas: dbName, nameModel e collectionName.',
     });
     return;
   }
 
   try {
-    const { getAllDocuments } = await mongodb(
-      dbName,
-      nameModel,
-      collectionName,
-    );
-
-    const documents = await getAllDocuments();
-
-    res.status(200).json(documents);
+    const { getAllDocument } = await mongodb(dbName, nameModel, collectionName);
+    const result = await getAllDocument();
+    res.json({
+      success: true,
+      data: result,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+      error: (error as Error).message,
     });
-    return;
   }
 });
 
 router.get('/', async (req, res) => {
-  const { collectionName, dbName, id } = req.query as {
+  const { collectionName, dbName, id, nameModel } = req.query as {
     id: string;
     dbName: string;
-    collectionName?: string;
+    collectionName: string;
+    nameModel: string;
   };
 
-  if (!dbName || !id) {
+  if (!dbName || !id || !collectionName || !nameModel) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: dbName, id, collectionName (OPCIONAL)',
+        'Algumas dessas informações não foram fornecidas: dbName, id, nameModel e collectionName.',
     });
     return;
   }
 
   try {
-    const { getDocumentById } = await mongodb(dbName, dbName, collectionName);
-    const document = await getDocumentById(id);
-    res.status(200).json(document);
-  } catch (error) {
+    const { getDocumentById } = await mongodb(
+      dbName,
+      nameModel,
+      collectionName,
+    );
+    const result = await getDocumentById(id);
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
     res.status(500).json({
       success: false,
-      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+      error: (err as Error).message,
     });
-    return;
   }
 });
 

@@ -5,22 +5,22 @@ import { SchemaDefinition } from 'mongoose';
 const router = express.Router();
 
 type IAddDocument = {
-  collectionName: string;
-  schema: SchemaDefinition;
-  data: any;
   dbName: string;
   nameModel: string;
+  collectionName?: string;
+  schema: SchemaDefinition;
+  data: any;
 };
 
 router.post('/', async (req, res) => {
   const { collectionName, schema, dbName, data, nameModel }: IAddDocument =
     req.body;
 
-  if (!schema || !data || !dbName || !nameModel || !collectionName) {
+  if (!schema || !data || !dbName || !nameModel) {
     res.status(400).json({
       success: false,
       error:
-        'Parâmetros inválidos. Envie schema, data, dbName, nameModel e collectionName',
+        'Parâmetros inválidos. Envie schema, data, dbName, nameModel, collectionName (OPCIONAL)',
     });
     return;
   }
@@ -29,13 +29,16 @@ router.post('/', async (req, res) => {
     const { createDocument } = await mongodb(dbName, nameModel, collectionName);
     const result = await createDocument(schema, data);
 
-    res.status(201).json(result);
+    res.json({
+      success: true,
+      data: result,
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
-      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+      error: 'Erro ao adicionar documento.',
     });
-    return;
   }
 });
 

@@ -21,15 +21,18 @@ router.delete('/', async (req, res) => {
   }
 
   try {
-    const { deleteDocument } = await mongodb(dbName, nameModel, collectionName);
-    const result = await deleteDocument(id);
-    res.status(200).json(result);
-  } catch (error) {
+    const { deleteDocumentById } = await mongodb(
+      dbName,
+      nameModel,
+      collectionName,
+    );
+    const deletedDoc = await deleteDocumentById(id);
+    res.status(200).json(deletedDoc);
+  } catch (err) {
     res.status(500).json({
       success: false,
-      error: 'Ocorreu algum erro interno. Tente novamente mais tarde.',
+      error: (err as Error).message,
     });
-    return;
   }
 });
 

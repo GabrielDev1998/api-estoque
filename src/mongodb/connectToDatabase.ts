@@ -4,9 +4,19 @@ import mongoose from 'mongoose';
 const connectToDatabase = async (url_db: string, dbName: string) => {
   try {
     if (mongoose.connection.readyState === 0) {
-      // Verifica se a conexão está fechada
+      // Estado 0: Desconectado
+      console.log('Conectando ao MongoDB...');
       await mongoose.connect(url_db, { dbName });
-      console.log('Conectado ao MongoDB');
+      console.log(`Conectado ao MongoDB na base de dados "${dbName}"`);
+    } else if (mongoose.connection.readyState === 1) {
+      // Estado 1: Conectado
+      console.log('Já conectado ao MongoDB');
+    } else if (mongoose.connection.readyState === 2) {
+      // Estado 2: Conectando
+      console.log('Conexão com MongoDB está em progresso...');
+    } else if (mongoose.connection.readyState === 3) {
+      // Estado 3: Desconectando
+      console.log('Desconectando do MongoDB...');
     }
   } catch (err) {
     console.error('Erro ao se conectar ao banco de dados:', err);
