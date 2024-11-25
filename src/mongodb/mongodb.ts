@@ -49,37 +49,56 @@ async function mongodb(
   const createDocument = async <T extends Document>(
     schema: SchemaDefinition,
     data: T,
-  ): Promise<T | null> => {
+  ) => {
     try {
       const Model = await getModel(schema);
       const document = new Model(data);
-      return await document.save();
+      return {
+        success: true,
+        data: await document.save(),
+      };
     } catch (err) {
       handleDatabaseError(ErrorMessages.CREATE_ERROR, err);
-      return null;
+      return {
+        success: false,
+        error: ErrorMessages.CREATE_ERROR,
+      };
     }
   };
 
   const getAllDocument = async () => {
     try {
       const Model = await getModel();
-      return await Model.find();
+      return {
+        success: true,
+        data: await Model.find(),
+      };
     } catch (err) {
       handleDatabaseError(ErrorMessages.LIST_ERROR, err);
+      return {
+        success: false,
+        error: ErrorMessages.LIST_ERROR,
+      };
     }
   };
 
-  const getDocumentById = async <T>(id: string): Promise<T | null> => {
+  const getDocumentById = async (id: string) => {
     if (!validID(id)) throw new Error(ErrorMessages.INVALID_ID);
 
     try {
       const Model = await getModel();
       const document = await Model.findById(id);
       if (!document) throw new Error(ErrorMessages.DOCUMENT_NOT_FOUND);
-      return document as T;
+      return {
+        success: true,
+        data: document,
+      };
     } catch (err) {
       handleDatabaseError(ErrorMessages.DOCUMENT_NOT_FOUND, err);
-      return null;
+      return {
+        success: false,
+        error: ErrorMessages.DOCUMENT_NOT_FOUND,
+      };
     }
   };
 
@@ -94,9 +113,16 @@ async function mongodb(
       if (!document) {
         throw new Error(ErrorMessages.DOCUMENT_NOT_FOUND);
       }
-      return document;
+      return {
+        success: true,
+        data: document,
+      };
     } catch (err) {
       handleDatabaseError(ErrorMessages.UPDATE_ERROR, err);
+      return {
+        success: false,
+        error: ErrorMessages.UPDATE_ERROR,
+      };
     }
   };
 
@@ -112,9 +138,16 @@ async function mongodb(
         throw new Error(ErrorMessages.DOCUMENT_NOT_FOUND);
       }
 
-      return { id: document._id.toString(), success: true };
+      return {
+        success: true,
+        data: document,
+      };
     } catch (err) {
       handleDatabaseError(ErrorMessages.DELETE_ERROR, err);
+      return {
+        success: false,
+        error: ErrorMessages.DELETE_ERROR,
+      };
     }
   };
 

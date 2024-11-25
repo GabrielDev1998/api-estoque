@@ -22,10 +22,7 @@ router.get('/all', async (req, res) => {
   try {
     const { getAllDocument } = await mongodb(dbName, nameModel, collectionName);
     const result = await getAllDocument();
-    res.json({
-      success: true,
-      data: result,
-    });
+    res.json(result);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -58,10 +55,7 @@ router.get('/', async (req, res) => {
       collectionName,
     );
     const result = await getDocumentById(id);
-    res.json({
-      success: true,
-      data: result,
-    });
+    res.json(result);
   } catch (err) {
     res.status(500).json({
       success: false,
