@@ -11,7 +11,7 @@ type IGetDocument = {
 };
 
 router.get('/all', async (req, res) => {
-  const { collectionName, dbName, nameModel }: IGetDocument = req.body;
+  const { collectionName, dbName, nameModel } = req.query as IGetDocument;
 
   if (!dbName || !nameModel || !collectionName) {
     res.status(400).json({
@@ -25,6 +25,7 @@ router.get('/all', async (req, res) => {
   try {
     const { getAllDocument } = await mongodb(dbName, nameModel, collectionName);
     const result = await getAllDocument();
+
     res.status(200).json(result);
   } catch (error) {
     console.error(error);

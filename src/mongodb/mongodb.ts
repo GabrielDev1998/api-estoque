@@ -72,6 +72,7 @@ async function mongodb(
   const getAllDocument = async () => {
     try {
       const Model = await getModel();
+
       return {
         success: true,
         data: await Model.find(),

@@ -25,6 +25,7 @@ router.post('/', async (req, res) => {
   try {
     const { createDocument } = await mongodb(dbName, nameModel, collectionName);
     const result = await createDocument(data);
+
     res.status(200).json(result);
   } catch (error) {
     console.error(error);
