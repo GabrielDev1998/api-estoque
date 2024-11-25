@@ -16,11 +16,11 @@ router.post('/', async (req, res) => {
   const { collectionName, schema, dbName, data, nameModel }: IAddDocument =
     req.body;
 
-  if (!schema || !data || !dbName || !nameModel) {
+  if (!schema || !data || !dbName || !nameModel || !collectionName) {
     res.status(400).json({
       success: false,
       error:
-        'Parâmetros inválidos. Envie schema, data, dbName, nameModel e collectionName (OPCIONAL).',
+        'Parâmetros inválidos. Envie schema, data, dbName, nameModel e collectionName',
     });
     return;
   }

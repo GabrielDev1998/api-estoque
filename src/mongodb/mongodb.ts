@@ -27,11 +27,16 @@ const getModel = (
   schema?: SchemaDefinition,
   collectionName?: string,
 ) => {
-  // Verifica se o modelo já foi criado anteriormente
   if (mongoose.models[nameModel]) {
     return mongoose.models[nameModel] as Model<DocumentData>;
   }
-  // Cria um novo modelo com o schema fornecido
+
+  if (!schema || !collectionName) {
+    throw new Error(
+      `Schema e collectionName são necessários para criar o modelo ${nameModel}.`,
+    );
+  }
+
   const DynamicModel = mongoose.model<DocumentData>(
     nameModel,
     new Schema(schema),
@@ -48,12 +53,10 @@ async function mongodb(
 ) {
   const URL_MONGODB = process.env.MONGODB_URL_PRODUCTION as string;
 
-  // Verifica ou conecta ao banco
   if (!mongoose.connection.readyState) {
     await connectToDatabase(URL_MONGODB, dbName);
   }
 
-  // Função para criar um documento
   const createDocument = async (
     schema: SchemaDefinition,
     data: DocumentData,
@@ -69,7 +72,6 @@ async function mongodb(
     }
   };
 
-  // Função para deletar um documento
   const deleteDocument = async (id: string) => {
     try {
       const objectId = validateId(id);
@@ -87,7 +89,6 @@ async function mongodb(
     }
   };
 
-  // Função para atualizar um documento
   const updateDocumentById = async (
     schema: SchemaDefinition,
     id: string,
@@ -101,8 +102,8 @@ async function mongodb(
         objectId,
         data,
         {
-          new: true, // Retorna o documento atualizado
-          runValidators: true, // Valida os dados antes de salvar
+          new: true,
+          runValidators: true,
         },
       );
 
@@ -121,7 +122,6 @@ async function mongodb(
     }
   };
 
-  // Função para listar todos os documentos
   const getAllDocuments = async () => {
     try {
       const DynamicModel = getModel(nameModel);
@@ -133,7 +133,6 @@ async function mongodb(
     }
   };
 
-  // Função para listar um documento por ID
   const getDocumentById = async (id: string) => {
     try {
       const objectId = validateId(id);
