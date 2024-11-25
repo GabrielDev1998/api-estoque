@@ -9,10 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/server.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://app-sequoia.vercel.app"
-      }
+      "dest": "dist/server.js"
     }
   ]
 }

@@ -3,28 +3,32 @@ import mongodb from '../../mongodb/mongodb';
 
 const router = express.Router();
 
-type IAddDocument = {
+type IDelDocument = {
   dbName: string;
   nameModel: string;
   collectionName?: string;
-  data: any;
+  id: string;
 };
 
-router.post('/', async (req, res) => {
-  const { collectionName, dbName, data, nameModel }: IAddDocument = req.body;
+router.delete('/', async (req, res) => {
+  const { collectionName, dbName, nameModel, id }: IDelDocument = req.body;
 
-  if (!dbName || !nameModel || !data || !collectionName) {
+  if (!dbName || !nameModel || !collectionName || !id) {
     res.status(400).json({
       success: false,
       error:
-        'Verifique se todos os campos foram informados. (dbName, data, nameModel, collectionName)',
+        'Verifique se todos os campos foram informados. (dbName, nameModel, collectionName, id)',
     });
     return;
   }
 
   try {
-    const { createDocument } = await mongodb(dbName, nameModel, collectionName);
-    const result = await createDocument(data);
+    const { deleteDocumentById } = await mongodb(
+      dbName,
+      nameModel,
+      collectionName,
+    );
+    const result = await deleteDocumentById(id);
     res.status(200).json(result);
   } catch (error) {
     console.error(error);

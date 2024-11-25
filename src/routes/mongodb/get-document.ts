@@ -3,18 +3,21 @@ import mongodb from '../../mongodb/mongodb';
 
 const router = express.Router();
 
+type IGetDocument = {
+  dbName: string;
+  nameModel: string;
+  collectionName?: string;
+  id: string;
+};
+
 router.get('/all', async (req, res) => {
-  const { collectionName, dbName, nameModel } = req.query as {
-    dbName: string;
-    nameModel: string;
-    collectionName: string;
-  };
+  const { collectionName, dbName, nameModel }: IGetDocument = req.body;
 
   if (!dbName || !nameModel || !collectionName) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: dbName, nameModel e collectionName.',
+        'Verifique se todos os campos foram informados. (dbName, nameModel, collectionName)',
     });
     return;
   }
@@ -22,8 +25,9 @@ router.get('/all', async (req, res) => {
   try {
     const { getAllDocument } = await mongodb(dbName, nameModel, collectionName);
     const result = await getAllDocument();
-    res.json(result);
+    res.status(200).json(result);
   } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
       error: (error as Error).message,
@@ -32,18 +36,13 @@ router.get('/all', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const { collectionName, dbName, id, nameModel } = req.query as {
-    id: string;
-    dbName: string;
-    collectionName: string;
-    nameModel: string;
-  };
+  const { collectionName, dbName, nameModel, id }: IGetDocument = req.body;
 
-  if (!dbName || !id || !collectionName || !nameModel) {
+  if (!dbName || !nameModel || !collectionName || !id) {
     res.status(400).json({
       success: false,
       error:
-        'Algumas dessas informações não foram fornecidas: dbName, id, nameModel e collectionName.',
+        'Verifique se todos os campos foram informados. (dbName, nameModel, collectionName, id)',
     });
     return;
   }
@@ -55,11 +54,12 @@ router.get('/', async (req, res) => {
       collectionName,
     );
     const result = await getDocumentById(id);
-    res.json(result);
-  } catch (err) {
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({
       success: false,
-      error: (err as Error).message,
+      error: (error as Error).message,
     });
   }
 });

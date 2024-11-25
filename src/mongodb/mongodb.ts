@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, SchemaDefinition } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import connectToDatabase from './connectToDatabase';
 
 const ErrorMessages = {
@@ -22,12 +22,16 @@ async function mongodb(
 
   await connectToDatabase(URL_DB, dbName);
 
-  const getModel = async (schema?: SchemaDefinition) => {
+  const getModel = async () => {
     try {
       const existingModel = mongoose.models[nameModel];
       return (
         existingModel ||
-        mongoose.model(nameModel, new Schema(schema), collectionName)
+        mongoose.model(
+          nameModel,
+          new Schema({}, { strict: false }),
+          collectionName,
+        )
       );
     } catch (error) {
       console.error('Erro ao validar o modelo', (error as Error).message);
@@ -46,16 +50,15 @@ async function mongodb(
     throw new Error(operation);
   };
 
-  const createDocument = async <T extends Document>(
-    schema: SchemaDefinition,
-    data: T,
-  ) => {
+  const createDocument = async <T extends Document>(data: T) => {
     try {
-      const Model = await getModel(schema);
+      const Model = await getModel();
       const document = new Model(data);
+      const savedDocument = await document.save();
+
       return {
         success: true,
-        data: await document.save(),
+        data: savedDocument,
       };
     } catch (err) {
       handleDatabaseError(ErrorMessages.CREATE_ERROR, err);
